@@ -4,8 +4,6 @@ namespace App\Http\Controllers;
 
 use App\Models\Student;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Redis;
-use Symfony\Component\HttpFoundation\Response;
 
 class StudentController extends Controller
 {
@@ -14,6 +12,14 @@ class StudentController extends Controller
         // mendapatkan semua data students
         $students = Student::all();
 
+        // jika data kosong maka kirim status code 204
+        if ($students->isEmpty()){
+            $data = [
+                "message"=>" Resource is empty"
+            ];
+        
+            return response()->json($data, 204);
+        }
         $data = [
             "message" => "Get all resources",
             "data" => $students
@@ -25,6 +31,14 @@ class StudentController extends Controller
 
     public function store(Request $request)
     {
+        // validasi data request
+        $request->validate([
+            "nama"=> "required",
+            "nim" => "0110222165",
+            "email" => "lidianaelisabet4@gmail.com",
+            "jurusan " => "required"
+        ]);
+        
         $input = [
             'nama' => $request->nama,
             'nim' => $request->nim,
@@ -41,22 +55,41 @@ class StudentController extends Controller
 
         return response()->json($data, 201);
     }
+
+    // mendapatkan detail resource student
+    // membuat method show
+    public function show($id){
+        // cari id student yang ingin didapatkan
+        $student = Student::fin ($id);
+        if ($student){
+            $data = [
+                "message"=> "get detail student",
+                "data"=> $student,
+            ];
+
+            // mengemalikan data (json) dan code 200
+            return response()->json($data, 200);
+        }else {
+            $data = [
+                "message"=>"Student not found",
+            ];
+            // mengembalikan data (json) dan  code 404
+            return response()->json($data, 404);
+        }
+    }
     public function update(Request $request, $id)
     {
-        $input = [
-            'nama' => $request->nama,
-            'nim' => $request->nim,
-            'email' => $request->email,
-            'jurusan' => $request->jurusan
-        ];
-
-        $students = Student::find($id);
-
-        $students->update($input);
+        $student = Student::find($id);
+        $student->update([
+            'nama' => $request->nama ?? $student->nama,
+            'nim' => $request->nim ?? $student->nim,
+            'email' => $request->email ?? $student->email,
+            'jurusan' => $request->jurusan ?? $student->jurusan
+        ]);
 
         $data = [
             "message" => "Student Berhasil di Perbaharui",
-            "data" => $students
+            "data" => $student
         ];
 
         return response()->json($data, 200);
