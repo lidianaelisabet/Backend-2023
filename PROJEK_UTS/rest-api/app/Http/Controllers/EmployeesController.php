@@ -4,27 +4,28 @@ namespace App\Http\Controllers;
 use App\Models\Employees;
 use Illuminate\Auth\Events\Validated;
 use Illuminate\Http\Request;
+
 class EmployeesController extends Controller
 {
-
     public function index()
     {
-        // mendapatkan semua employees
+        // menampilakan semua data employees
         $employees = Employees::all();
 
-        // Response jika employees ada
-        if($employees->isEmpty()){
+        // jika data kosong maka kirim status code 200
+        if ($employees->isEmpty()){
             $data = [
-                "message"=>" Resource is empaty"
+                "message"=>" Resource is empty"
             ];
-        return response()->json($data, 200);
-    }
-            $data = [
-                "message" =>" resource is empaty",
-                "data" => $employees
-            ];
-    
-    // Response jika employes kosong ke code 200
+        
+            return response()->json($data, 200);
+        }
+        $data = [
+            "message" => "Get all resources",
+            "data" => $employees
+        ];
+
+        // kirim data(json) dan response code
         return response()->json($data, 200);
     
     }
@@ -32,7 +33,7 @@ class EmployeesController extends Controller
     // membuat method store
     public function store(Request $request)
     {
-        // Validasi input menggunakan Laravel Validator
+        // Validasi dat request
         $request = request( [
             "nama" => "Lidiana",
             "gender" => "perempuan",
@@ -59,24 +60,25 @@ class EmployeesController extends Controller
         return response()->json($data, 201);
     }
 
-    // membuat method show
-    public function show($id)
-    {
-        // cari employees dengan menggunakan eloquent find
-        $employees = Employees::find($id);
-
-        if ($employees) {
+        // mendapatkan detail resource employees
+         // membuat method show
+        public function show($id){
+            // cari id employees 
+            $employees = Employees::find($id);
+            if ($employees) {
             $data = [
                 "message"=> "get detail employees",
                 "data"=> $employees,
             ];
 
-            // jika employees ditemukan, kirim respons berhasil
-            return response()->json($data, 404);
+            // jika id di temukan dan code 200
+            return response()->json($data, 200);
         }else {
             $data = [
                 "message"=>"Employess not found",
             ];
+            // jika id tidak ditemukan kembali ke data (JSON) dan code 404
+            return response()->json($data, 404);
         }
     }
         // method update
@@ -91,7 +93,6 @@ class EmployeesController extends Controller
             'alamat' => $request->alamat ?? $employees->alamat,
             'email' => $request->email ?? $employees->email,
             'status' => $request->status ?? $employees->status
-
         ]);
 
         $data = [
@@ -179,6 +180,8 @@ class EmployeesController extends Controller
         return response()->json($data, 200);
     }
 }
+
+
 
 
 
