@@ -43,3 +43,5 @@ Route::get('/inactive', [EmployeesController::class, 'inactive']);
 // Method terminated
 Route::get('/terminated', [EmployeesController::class, 'terminated']);
 
+
+
